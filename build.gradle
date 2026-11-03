@@ -1,0 +1,11 @@
+plugins { id 'base' }
+tasks.named('build') {
+    dependsOn ':mixin-bootstrap:build'
+    if (findProject(':mixin-mapping-probe') != null) dependsOn ':mixin-mapping-probe:build', ':sided-probe:build'
+}
+allprojects {
+    tasks.withType(AbstractArchiveTask).configureEach {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+}

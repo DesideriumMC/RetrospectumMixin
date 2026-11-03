@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8.7",
+  "target": "@env(DEFAULT)",
+  "package": "dev.desiderium.retro.mixin.probe.mixin",
+  "plugin": "dev.desiderium.retro.mixin.probe.ProbeConfigPlugin",
+  "compatibilityLevel": "JAVA_6",
+  "refmap": "mixins.retromixin.p1.refmap.json",
+  "mixins": ["CommonProbe"],
+  "client": ["ClientProbe"],
+  "injectors": { "defaultRequire": 1 }
+}

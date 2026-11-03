@@ -1,0 +1,10 @@
+{
+  "note": "Observed SHA-256 of official Mixin AP classifier, not an independently signed provenance claim. Runtime inputs remain in p1-inputs.lock.json.",
+  "annotationProcessor": [
+    {
+      "coordinate": "org.spongepowered:mixin:0.8.7:processor",
+      "sha256": "77aac0d515b69b3faf14f25304066bf2b8a55b44b0356d2adcdde20e2d166f77",
+      "source": "https://repo.spongepowered.org/repository/maven-public/org/spongepowered/mixin/0.8.7/mixin-0.8.7-processor.jar"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "project": "RetroMixin",
+  "upstreamCommit": "da68a85cc6b5b6e336edd6f37db37f5b9657441e",
+  "gradle": {
+    "version": "8.14.6",
+    "sha256": "7988ed071b2a07900e2ec715fca15c6ab72bce6db433af301fa7fa7e9407bd24",
+    "wrapperJarSha256": "ad16bca46cb71bb5887c546860d93992aeee35c1fdaf4a242b0a612375d937e0"
+  },
+  "artifacts": [
+    {
+      "name": "minecraft-client",
+      "url": "https://launcher.mojang.com/v1/objects/1703704407101cf72bd88e68579e3696ce733ecd/client.jar",
+      "upstreamSha1": "1703704407101cf72bd88e68579e3696ce733ecd",
+      "sha256": "f4513e51c766cdd1d32ca8acd0835d7e16e2851ebea3f2a3b4ce5ae696baf3ae",
+      "license": "Minecraft EULA; local use only; do not redistribute"
+    },
+    {
+      "name": "minecraft-server",
+      "url": "https://launcher.mojang.com/v1/objects/050f93c1f3fe9e2052398f7bd6aca10c63d64a87/server.jar",
+      "upstreamSha1": "050f93c1f3fe9e2052398f7bd6aca10c63d64a87",
+      "sha256": "81841a2fedfe0ce19983156a06fa5294335284beeb95c8ca872d3c1a5fcf5774",
+      "license": "Minecraft EULA; local use only; do not redistribute"
+    },
+    {
+      "name": "forge-1.6.4-9.11.1.1345-src.zip",
+      "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.6.4-9.11.1.1345/forge-1.6.4-9.11.1.1345-src.zip",
+      "sha256": "8543c4bbc02ace1fc72b9a85b38c01276eef07080f86bae847c1696af5ee749f",
+      "license": "Forge/FML and bundled component notices; full inventory pending"
+    },
+    {
+      "name": "forge-1.6.4-9.11.1.1345-universal.jar",
+      "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.6.4-9.11.1.1345/forge-1.6.4-9.11.1.1345-universal.jar",
+      "sha256": "7acfb321c4b1fd35253b73dd2715f47cf3c38ee3ec4586d762c217114697df01",
+      "license": "Forge/FML and bundled component notices; full inventory pending"
+    }
+  ],
+  "forgeInstaller": {
+    "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.6.4-9.11.1.1345/forge-1.6.4-9.11.1.1345-installer.jar",
+    "sha256": "01a1845146ad7e5b00e4ff5e6d4d378577634c3dc6ca7e574ce42aabf6025dc0"
+  },
+  "origin": "Copied observed official artifact hashes from DesideriumLoom; compiler metadata is updated for this baseline.",
+  "compiler": {
+    "major": 8,
+    "source": "1.6",
+    "target": "1.6"
+  }
+}

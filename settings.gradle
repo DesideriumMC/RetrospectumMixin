@@ -1,0 +1,18 @@
+pluginManagement {
+    repositories { maven { url = 'https://maven.fabricmc.net/' }; gradlePluginPortal(); mavenCentral() }
+    def loomCheckout = file(providers.gradleProperty('retrospectumLoomCheckout').getOrElse('../RetrospectumLoom'))
+    if (providers.gradleProperty('integrationProbes').getOrElse('true').toBoolean() && loomCheckout.isDirectory()) {
+        includeBuild(loomCheckout)
+    }
+}
+rootProject.name = 'RetrospectumMixin'
+include('mixin-bootstrap')
+project(':mixin-bootstrap').projectDir = file('runtime/mixin-bootstrap')
+def loomCheckout = file(providers.gradleProperty('retrospectumLoomCheckout').getOrElse('../RetrospectumLoom'))
+def probes = providers.gradleProperty('integrationProbes').getOrElse(loomCheckout.isDirectory().toString()).toBoolean()
+if (probes) {
+    if (!loomCheckout.isDirectory()) throw new GradleException('Integration probes require retrospectumLoomCheckout to point to RetrospectumLoom.')
+    include('mixin-mapping-probe', 'sided-probe')
+    project(':mixin-mapping-probe').projectDir = file('samples/mixin-mapping-probe')
+    project(':sided-probe').projectDir = file('samples/sided-probe')
+}

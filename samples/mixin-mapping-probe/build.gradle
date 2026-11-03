@@ -1,0 +1,39 @@
+plugins { id 'dev.desiderium.retro.loom' }
+group = 'dev.desiderium.retro.mixin.samples'
+version = '0.1.0-SNAPSHOT'
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+tasks.withType(JavaCompile).configureEach { sourceCompatibility = '1.6'; targetCompatibility = '1.6' }
+repositories {
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/'; content { includeGroup 'org.spongepowered' } }
+}
+dependencies {
+    minecraft 'com.mojang:minecraft:1.6.4'
+    forge 'net.minecraftforge:forge:1.6.4-9.11.1.1345:universal'
+    mappings 'net.minecraftforge:forge:1.6.4-9.11.1.1345:src@zip'
+    annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
+    mixinBootstrap project(path: ':mixin-bootstrap', configuration: 'shadow')
+}
+retrospectum.mixin('main', 'mixins.retromixin.p2.refmap.json')
+retrospectum.runs {
+    client {
+        programArg '--username=RetroMixinP2'
+    }
+    server {
+        runDir = 'run-server'
+    }
+}
+retrospectum.mixinConfig('mixins.retromixin.p2.json')
+
+tasks.register('verifyP2Inputs') {
+    doLast {
+        def lock = new groovy.json.JsonSlurper().parse(rootProject.file('gradle/p2-inputs.lock.json'))
+        configurations.annotationProcessor.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+            def id = "${artifact.moduleVersion.id.group}:${artifact.name}:${artifact.moduleVersion.id.version}:${artifact.classifier}"
+            def pinned = lock.annotationProcessor.find { it.coordinate == id }
+            if (pinned == null) throw new GradleException("Unpinned P2 AP artifact: $id")
+            def sha = java.security.MessageDigest.getInstance('SHA-256').digest(artifact.file.bytes).encodeHex().toString()
+            if (sha != pinned.sha256) throw new GradleException("P2 AP checksum mismatch: $id")
+        }
+    }
+}
+tasks.named('compileJava') { dependsOn tasks.named('verifyP2Inputs') }

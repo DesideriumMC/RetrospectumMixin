@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "minVersion": "0.8.7",
+  "target": "@env(DEFAULT)",
+  "package": "dev.desiderium.retro.mixin.mappingprobe.mixin",
+  "compatibilityLevel": "JAVA_6",
+  "refmap": "mixins.retromixin.p2.refmap.json",
+  "mixins": ["StackProbe", "StackAccess", "FoodProbe"],
+  "injectors": { "defaultRequire": 1 }
+}

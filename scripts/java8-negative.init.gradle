@@ -1,0 +1,9 @@
+// Deliberately unsupported mod output; the release task must reject it before remapping.
+gradle.projectsEvaluated {
+    allprojects {
+        tasks.withType(JavaCompile).configureEach {
+            sourceCompatibility = '1.8'
+            targetCompatibility = '1.8'
+        }
+    }
+}
