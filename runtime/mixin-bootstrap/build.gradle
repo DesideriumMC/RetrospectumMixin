@@ -1,0 +1,227 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'dev.desiderium.retro'
+base.archivesName = 'retrospectum-mixin'
+version = rootProject.version
+def mixinVersion = providers.gradleProperty('mixinVersion').getOrElse('0.8.7')
+if (!(mixinVersion in ['0.8.7'])) throw new GradleException('RetroMixin pins Mixin 0.8.7')
+
+repositories {
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/'; content { includeGroup 'org.spongepowered' } }
+    maven { url = 'https://libraries.minecraft.net/'; content { includeGroup 'net.minecraft' } }
+    maven { url = 'https://maven.minecraftforge.net/'; metadataSources { artifact() }; content { includeGroup 'net.minecraftforge' } }
+    mavenCentral()
+}
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+sourceSets.main.java.srcDir('src/upstream/java')
+sourceSets {
+    forgeMetadata { compileClasspath = configurations.compileClasspath }
+}
+
+def java7Home = providers.gradleProperty('java7Home')
+if (!java7Home.isPresent()) throw new GradleException('Set java7Home to a Java 7 JDK; see README.md.')
+def java7RuntimeJar = file("${java7Home.get()}/jre/lib/rt.jar")
+if (!java7RuntimeJar.isFile()) throw new GradleException("Missing Java 7 runtime API archive: $java7RuntimeJar")
+def java7Release = file("${java7Home.get()}/release")
+if (!java7Release.isFile() || !java7Release.text.contains('JAVA_VERSION="1.7.'))
+    throw new GradleException('java7Home must point to a Java 7 JDK.')
+
+tasks.register('verifyUpstreamSources') {
+    inputs.file(rootProject.file('gradle/mixin-upstream.lock.json'))
+    inputs.files(fileTree('src/upstream/java'))
+    doLast {
+        def lock = new groovy.json.JsonSlurper().parse(rootProject.file('gradle/mixin-upstream.lock.json'))
+        lock.files.each { name, expected ->
+            def source = file("src/upstream/java/$name")
+            def hash = java.security.MessageDigest.getInstance('SHA-256').digest(source.bytes).encodeHex().toString()
+            if (hash != expected) throw new GradleException("Upstream source checksum mismatch: $name")
+        }
+    }
+}
+tasks.named('compileJava') { dependsOn 'verifyUpstreamSources' }
+
+def notices = layout.buildDirectory.dir('generated/notices')
+tasks.register('collectRuntimeNotices') {
+    inputs.files(configurations.runtimeClasspath)
+    outputs.dir(notices)
+    doLast {
+        def outputDirectory = notices.get().asFile.canonicalFile
+        if (!outputDirectory.toPath().startsWith(projectDir.canonicalFile.toPath()))
+            throw new GradleException('Generated notices must stay inside this runtime project.')
+        delete(outputDirectory)
+        configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+            def prefix = "${artifact.moduleVersion.id.group}-${artifact.name}-${artifact.moduleVersion.id.version}"
+            def output = new File(notices.get().asFile, "META-INF/licenses/$prefix")
+            new java.util.zip.ZipFile(artifact.file).withCloseable { archive ->
+                archive.entries().each { entry ->
+                    if (!entry.directory && entry.name.tokenize('/').last().toUpperCase().matches('(LICENSE|NOTICE|COPYING).*')) {
+                        def target = new File(output, entry.name.replace('/', '_'))
+                        target.parentFile.mkdirs()
+                        archive.getInputStream(entry).withCloseable { stream -> target.bytes = stream.bytes }
+                    }
+                }
+            }
+        }
+    }
+}
+sourceSets.main.resources.srcDir(notices)
+tasks.named('processResources') {
+    dependsOn 'collectRuntimeNotices'
+    doFirst {
+        def outputDirectory = destinationDir.canonicalFile
+        if (!outputDirectory.toPath().startsWith(projectDir.canonicalFile.toPath()))
+            throw new GradleException('Generated resources must stay inside this runtime project.')
+        delete(outputDirectory)
+    }
+}
+tasks.withType(JavaCompile).configureEach {
+    sourceCompatibility = '1.7'
+    targetCompatibility = '1.7'
+    options.bootstrapClasspath = files(java7RuntimeJar)
+    options.compilerArgs += ['-proc:none']
+}
+dependencies {
+    implementation("org.spongepowered:mixin:${mixinVersion}") { transitive = false }
+    implementation 'org.ow2.asm:asm:9.7.1'
+    implementation 'org.ow2.asm:asm-tree:9.7.1'
+    implementation 'org.ow2.asm:asm-commons:9.7.1'
+    implementation 'org.ow2.asm:asm-util:9.7.1'
+    implementation 'com.google.guava:guava:20.0'
+    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'org.apache.logging.log4j:log4j-api:2.12.4'
+    implementation 'org.apache.logging.log4j:log4j-core:2.12.4'
+    compileOnly 'net.minecraft:launchwrapper:1.8'
+    compileOnly('net.minecraftforge:forge:1.6.4-9.11.1.1345:universal') { transitive = false }
+}
+tasks.named('shadowJar') {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveClassifier = 'shaded'
+    archiveBaseName = 'retrospectum-mixin'
+    relocate 'org.objectweb.asm', 'dev.desiderium.retro.mixin.internal.asm'
+    relocate 'com.google.common', 'dev.desiderium.retro.mixin.internal.guava'
+    relocate 'com.google.thirdparty', 'dev.desiderium.retro.mixin.internal.guava.thirdparty'
+    relocate 'com.google.gson', 'dev.desiderium.retro.mixin.internal.gson'
+    relocate 'org.apache.logging.log4j', 'dev.desiderium.retro.mixin.internal.log4j'
+    mergeServiceFiles {
+        // These three files are supplied explicitly by this LaunchWrapper runtime.
+        exclude 'META-INF/services/org.spongepowered.asm.service.*'
+    }
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer)
+    exclude 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/*.DSA', 'module-info.class', 'META-INF/versions/**'
+    // This runtime is exclusively for LaunchWrapper. Official Mixin also ships
+    // Java 16 ModLauncher classes; they must not enter a Java 7 distribution.
+    exclude 'org/spongepowered/asm/service/modlauncher/**'
+    exclude 'org/spongepowered/asm/launch/MixinLaunchPlugin*.class'
+    exclude 'org/spongepowered/asm/launch/MixinTransformationService*.class'
+    exclude 'org/spongepowered/asm/launch/platform/container/ContainerHandleModLauncher*.class'
+    exclude 'META-INF/services/cpw.mods.modlauncher.*'
+    exclude 'org/spongepowered/asm/launch/IClassProcessor.class', 'org/spongepowered/asm/launch/Phases*.class', 'org/spongepowered/asm/launch/platform/MixinPlatformAgentMinecraftForge*.class'
+    // The AP belongs on annotationProcessor, never in a player's runtime.
+    exclude 'org/spongepowered/tools/**'
+    exclude 'META-INF/services/javax.annotation.processing.Processor'
+    exclude 'META-INF/services/org.spongepowered.tools.obfuscation.service.IObfuscationService'
+    manifest.attributes('TweakClass': 'dev.desiderium.retro.mixin.bootstrap.RetroMixinTweaker',
+        'TweakOrder': '1000', 'Implementation-Version': "${project.version}+mixin.${mixinVersion}")
+}
+tasks.named('jar') { archiveClassifier = 'thin' }
+// Keep the metadata class outside relocation: its registerBus signature uses
+// Forge's Guava EventBus, while Mixin's Guava remains private.
+def runtimeJar = tasks.register('runtimeJar', Jar) {
+    dependsOn tasks.named('shadowJar'), tasks.named('forgeMetadataClasses')
+    archiveBaseName = 'retrospectum-mixin'
+    archiveClassifier = ''
+    from({ zipTree(tasks.named('shadowJar').get().archiveFile.get().asFile) }) {
+        exclude 'META-INF/MANIFEST.MF'
+        // These project notices are added to every JAR below.
+        exclude 'META-INF/LICENSE', 'META-INF/THIRD-PARTY.md', 'META-INF/UPSTREAM.md'
+    }
+    from(sourceSets.forgeMetadata.output)
+    manifest.from(tasks.named('shadowJar').get().manifest)
+}
+configurations.shadow.outgoing.artifacts.clear()
+artifacts { add('shadow', runtimeJar) }
+tasks.named('assemble') { dependsOn runtimeJar }
+
+tasks.register('verifyRuntimeInputs') {
+    doLast {
+        def lock = new groovy.json.JsonSlurper().parse(rootProject.file('gradle/runtime-inputs.lock.json'))
+        configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+            def id = "${artifact.moduleVersion.id.group}:${artifact.name}:${artifact.moduleVersion.id.version}"
+            def pinned = lock.runtime.find { it.coordinate == id }
+            if (pinned == null) throw new GradleException("Unpinned runtime artifact: $id")
+            def sha = java.security.MessageDigest.getInstance('SHA-256').digest(artifact.file.bytes).encodeHex().toString()
+            if (sha != pinned.sha256) throw new GradleException("Runtime checksum mismatch: $id")
+        }
+    }
+}
+tasks.named('shadowJar') { dependsOn tasks.named('verifyRuntimeInputs') }
+
+tasks.register('verifyForgeInput') {
+    inputs.file(rootProject.file('gradle/build-inputs.lock.json'))
+    doLast {
+        def lock = new groovy.json.JsonSlurper().parse(rootProject.file('gradle/build-inputs.lock.json'))
+        def pinned = lock.artifacts.find { it.name == 'forge-1.6.4-9.11.1.1345-universal.jar' }
+        def artifact = configurations.compileClasspath.resolvedConfiguration.resolvedArtifacts.find {
+            it.moduleVersion.id.group == 'net.minecraftforge' && it.name == 'forge'
+        }
+        def hash = java.security.MessageDigest.getInstance('SHA-256').digest(artifact.file.bytes).encodeHex().toString()
+        if (hash != pinned.sha256) throw new GradleException('Forge metadata API checksum mismatch')
+    }
+}
+tasks.named('compileForgeMetadataJava') { dependsOn 'verifyForgeInput' }
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+tasks.named('sourcesJar') {
+    dependsOn 'collectRuntimeNotices'
+    from sourceSets.forgeMetadata.allSource
+}
+tasks.withType(Jar).configureEach {
+    from(rootProject.file('LICENSE')) { into 'META-INF' }
+    from(rootProject.file('THIRD-PARTY.md')) { into 'META-INF' }
+    from('UPSTREAM.md') { into 'META-INF' }
+}
+publishing {
+    publications {
+        runtime(MavenPublication) {
+            artifactId = 'retrospectum-mixin'
+            artifact runtimeJar
+            artifact tasks.named('sourcesJar')
+            artifact tasks.named('javadocJar')
+            pom {
+                name = 'Retrospectum Mixin'
+                description = 'Shared Mixin 0.8.7 bootstrap for Minecraft Forge 1.6.4 on Java 7 and 8'
+                url = 'https://github.com/DesideriumMC/RetrospectumMixin'
+                licenses { license { name = 'MIT'; url = 'https://opensource.org/license/mit/' } }
+                developers { developer { id = 'DesideriumMC'; name = 'DesideriumMC contributors'; url = 'https://github.com/DesideriumMC' } }
+                scm {
+                    url = 'https://github.com/DesideriumMC/RetrospectumMixin'
+                    connection = 'scm:git:https://github.com/DesideriumMC/RetrospectumMixin.git'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'localBuild'
+            url = rootProject.layout.buildDirectory.dir('maven')
+        }
+    }
+}
+tasks.register('mixinDistribution', Zip) {
+    dependsOn tasks.named('publishAllPublicationsToLocalBuildRepository')
+    archiveFileName = "retrospectum-mixin-${project.version}-maven.zip"
+    destinationDirectory = rootProject.layout.buildDirectory.dir('distributions')
+    into('mixin-maven') {
+        from(rootProject.layout.buildDirectory.dir('maven')) {
+            include "dev/desiderium/retro/retrospectum-mixin/${project.version}/**"
+        }
+        from(rootProject.file('LICENSE'), rootProject.file('THIRD-PARTY.md'), file('UPSTREAM.md'))
+    }
+}

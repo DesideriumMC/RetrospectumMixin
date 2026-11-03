@@ -1,0 +1,65 @@
+{
+  "note": "Pinned official runtime inputs for Java 7; SHA-256 values checked before shading.",
+  "runtime": [
+    {
+      "coordinate": "org.spongepowered:mixin:0.8.7",
+      "url": "https://repo.spongepowered.org/repository/maven-public/org/spongepowered/mixin/0.8.7/mixin-0.8.7.jar",
+      "sha256": "87aaa7ee080465ed7ea13616679534abcdbfdd636b4752d0eff0a00017e235c0"
+    },
+    {
+      "coordinate": "org.ow2.asm:asm:9.7.1",
+      "url": "https://repo.maven.apache.org/maven2/org/ow2/asm/asm/9.7.1/asm-9.7.1.jar",
+      "sha256": "8cadd43ac5eb6d09de05faecca38b917a040bb9139c7edeb4cc81c740b713281"
+    },
+    {
+      "coordinate": "org.ow2.asm:asm-tree:9.7.1",
+      "url": "https://repo.maven.apache.org/maven2/org/ow2/asm/asm-tree/9.7.1/asm-tree-9.7.1.jar",
+      "sha256": "9929881f59eb6b840e86d54570c77b59ce721d104e6dfd7a40978991c2d3b41f"
+    },
+    {
+      "coordinate": "org.ow2.asm:asm-commons:9.7.1",
+      "url": "https://repo.maven.apache.org/maven2/org/ow2/asm/asm-commons/9.7.1/asm-commons-9.7.1.jar",
+      "sha256": "9a579b54d292ad9be171d4313fd4739c635592c2b5ac3a459bbd1049cddec6a0"
+    },
+    {
+      "coordinate": "org.ow2.asm:asm-util:9.7.1",
+      "url": "https://repo.maven.apache.org/maven2/org/ow2/asm/asm-util/9.7.1/asm-util-9.7.1.jar",
+      "sha256": "f885be71b5c90556f5f1ad1c4f9276b29b96057c497d46666fe4ddbec3cb43c6"
+    },
+    {
+      "coordinate": "org.ow2.asm:asm-analysis:9.7.1",
+      "url": "https://repo.maven.apache.org/maven2/org/ow2/asm/asm-analysis/9.7.1/asm-analysis-9.7.1.jar",
+      "sha256": "85b29371884ba31bb76edf22323c2c24e172c3267a67152eba3d1ccc2e041ef2"
+    },
+    {
+      "coordinate": "com.google.code.gson:gson:2.8.9",
+      "url": "https://repo.maven.apache.org/maven2/com/google/code/gson/gson/2.8.9/gson-2.8.9.jar",
+      "sha256": "d3999291855de495c94c743761b8ab5176cfeabe281a5ab0d8e8d45326fd703e"
+    },
+    {
+      "coordinate": "com.google.guava:guava:20.0",
+      "url": "https://repo.maven.apache.org/maven2/com/google/guava/guava/20.0/guava-20.0.jar",
+      "sha256": "36a666e3b71ae7f0f0dca23654b67e086e6c93d192f60ba5dfd5519db6c288c8",
+      "upstreamSha1": "89507701249388e1ed5ddcf8c41f4ce1be7831ef"
+    },
+    {
+      "coordinate": "org.apache.logging.log4j:log4j-api:2.12.4",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/logging/log4j/log4j-api/2.12.4/log4j-api-2.12.4.jar",
+      "sha256": "eba632527dbd9add4ebbbc7596150bf73dedbdddfe177bf500b1ea6b20ad9c6d",
+      "upstreamSha1": "746982c15f986fec96092efb21db9ab4c087ce4c"
+    },
+    {
+      "coordinate": "org.apache.logging.log4j:log4j-core:2.12.4",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/logging/log4j/log4j-core/2.12.4/log4j-core-2.12.4.jar",
+      "sha256": "542d5c64c5b9456909fb2671a7d0960973fb6cec61f00a8e9530b3399cba27cd",
+      "upstreamSha1": "de45342defbe870572478ebd1589b86f4aa87deb"
+    }
+  ],
+  "sources": [
+    {
+      "name": "mixin-0.8.7-sources.jar",
+      "url": "https://repo.spongepowered.org/repository/maven-public/org/spongepowered/mixin/0.8.7/mixin-0.8.7-sources.jar",
+      "sha256": "e0bbac78e8021355c9b2bbe33643b3d87e9e2267bd3e57730b301d58f5f0d56a"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+java7Home=/absolute/path/to/jdk7
+org.gradle.java.installations.paths=/absolute/path/to/jdk8,/absolute/path/to/jdk7
+org.gradle.java.installations.auto-download=false
+org.gradle.jvmargs=-Xmx2G -Dfile.encoding=UTF-8

@@ -1,0 +1,3 @@
+rootProject.name = 'RetrospectumMixin'
+include('mixin-bootstrap')
+project(':mixin-bootstrap').projectDir = file('runtime/mixin-bootstrap')

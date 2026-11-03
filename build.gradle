@@ -1,0 +1,10 @@
+plugins { id 'base' }
+allprojects {
+    group = 'dev.desiderium.retro'
+    version = rootProject.property('version')
+    tasks.withType(AbstractArchiveTask).configureEach {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+}
+tasks.named('build') { dependsOn ':mixin-bootstrap:build' }
