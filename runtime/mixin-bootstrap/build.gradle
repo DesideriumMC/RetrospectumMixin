@@ -23,12 +23,15 @@ sourceSets {
 }
 
 def java7Home = providers.gradleProperty('java7Home')
-if (!java7Home.isPresent()) throw new GradleException('Set java7Home to a Java 7 JDK; see README.md.')
-def java7RuntimeJar = file("${java7Home.get()}/jre/lib/rt.jar")
-if (!java7RuntimeJar.isFile()) throw new GradleException("Missing Java 7 runtime API archive: $java7RuntimeJar")
-def java7Release = file("${java7Home.get()}/release")
-if (!java7Release.isFile() || !java7Release.text.contains('JAVA_VERSION="1.7.'))
-    throw new GradleException('java7Home must point to a Java 7 JDK.')
+def java7RuntimeJar = providers.provider {
+    if (!java7Home.isPresent()) throw new GradleException('Set java7Home to a Java 7 JDK; see README.md.')
+    def home = file(java7Home.get())
+    def runtime = new File(home, 'jre/lib/rt.jar')
+    def release = new File(home, 'release')
+    if (!runtime.isFile() || !release.isFile() || !release.text.contains('JAVA_VERSION="1.7.'))
+        throw new GradleException("java7Home must point to a Java 7 JDK with jre/lib/rt.jar: $home")
+    runtime
+}
 
 tasks.register('verifyUpstreamSources') {
     inputs.file(rootProject.file('gradle/mixin-upstream.lock.json'))

@@ -8,3 +8,5 @@ allprojects {
     }
 }
 tasks.named('build') { dependsOn ':mixin-bootstrap:build' }
+
+tasks.withType(Javadoc).configureEach { options.addBooleanOption('notimestamp', true) }

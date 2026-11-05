@@ -410,7 +410,9 @@ public class MixinPlatformAgentFMLLegacy extends MixinPlatformAgentAbstract impl
             IRemapper remapper = (IRemapper)mdCreate.invoke(null);
             MixinEnvironment.getDefaultEnvironment().getRemappers().add(remapper);
         } catch (Exception ex) {
-            MixinPlatformAgentAbstract.logger.debug("Failed instancing FML remapper adapter, things will probably go horribly for notch-obf'd mods!");
+            Throwable cause = ex instanceof java.lang.reflect.InvocationTargetException
+                    ? ((java.lang.reflect.InvocationTargetException) ex).getTargetException() : ex;
+            throw new IllegalStateException("Cannot install the required Forge 1.6.4 remapper adapter", cause);
         }
     }
 

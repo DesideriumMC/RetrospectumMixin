@@ -5,7 +5,7 @@
   "files": {
     "org/spongepowered/asm/bridge/RemapperAdapter.java": "ec8be0bd901496352ce9dd3621867af64a3e1c0b0be58cdd8547f6069b63f48d",
     "org/spongepowered/asm/launch/MixinTweaker.java": "686eb3881b3455fa5041e25b89c21e63017a6fd24a1fd532d003206a03d59452",
-    "org/spongepowered/asm/launch/platform/MixinPlatformAgentFMLLegacy.java": "ebd58015e6efe527557877d28394a0a8341109c1560678959e93520ffe0283cc",
+    "org/spongepowered/asm/launch/platform/MixinPlatformAgentFMLLegacy.java": "c7f6839ced6f01afe3b09e35b440bd45a556f4ddba3536a54fbdc68cb6049f73",
     "org/spongepowered/asm/launch/platform/MixinPlatformAgentLiteLoaderLegacy.java": "cc72738b55de4d10c5606a80a56a9b421a611b85d771cee999ded5c5f4797870",
     "org/spongepowered/asm/mixin/EnvironmentStateTweaker.java": "68fed31b0db5eeeafacba2bab259deeed6bd12a8f50840a6d74ccc989b7bf37a",
     "org/spongepowered/asm/mixin/transformer/Proxy.java": "c4dd70595e11a7c579de83bb2bff4501da9485021db9749a176f7c3ccba43af3",
@@ -15,5 +15,11 @@
     "org/spongepowered/asm/service/mojang/LoggerAdapterLog4j2.java": "470810b54dd58d84751ad4c38822e2ff5a89ab7c140cc3d12baf24d7345b9ac1",
     "org/spongepowered/asm/service/mojang/MixinServiceLaunchWrapper.java": "835e51778c0da8954b954f99b6a8c240cf9e450af518ac419f6e157cf76e2fec",
     "org/spongepowered/asm/service/mojang/MixinServiceLaunchWrapperBootstrap.java": "c5c4d096c3741faa00c8234c183a1a44ebbf0b4bf0b481c9599859d5c64b6f4a"
+  },
+  "patches": {
+    "org/spongepowered/asm/launch/platform/MixinPlatformAgentFMLLegacy.java": {
+      "upstreamSha256": "ebd58015e6efe527557877d28394a0a8341109c1560678959e93520ffe0283cc",
+      "reason": "Fail startup when the required FML remapper cannot be installed; preserve the reflection target cause."
+    }
   }
 }

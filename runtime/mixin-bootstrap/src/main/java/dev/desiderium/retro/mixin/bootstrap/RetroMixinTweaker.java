@@ -56,7 +56,7 @@ public final class RetroMixinTweaker implements ITweaker {
                 JarFile jar = new JarFile(file);
                 try {
                     Manifest manifest = jar.getManifest();
-                    String declared = manifest == null ? null : manifest.getMainAttributes().getValue("RetroMixinConfigs");
+                    String declared = manifest == null ? null : manifest.getMainAttributes().getValue("MixinConfigs");
                     if (declared == null) continue;
                     Launch.classLoader.addURL(file.getCanonicalFile().toURI().toURL());
                     // Early config visibility must not cause a second @Mod discovery.
@@ -68,6 +68,9 @@ public final class RetroMixinTweaker implements ITweaker {
                         validateConfig(name.trim());
                         if (jar.getJarEntry(name.trim()) == null) throw new IllegalStateException("Missing config " + name);
                     }
+                    // Early discovery is needed for ordinary Forge mods. Mixin 0.8.7
+                    // caches and deduplicates configs by name if its platform agent
+                    // encounters the same standard manifest entry later.
                     addConfigs(declared);
                 } finally { jar.close(); }
             } catch (Exception e) { throw new IllegalStateException("Cannot discover Mixin configs in " + file, e); }

@@ -11,7 +11,7 @@ installation and configure the JDK paths as shown in `gradle.properties.example`
 ./gradlew build :mixin-bootstrap:mixinDistribution
 ```
 
-Output: `runtime/mixin-bootstrap/build/libs/retrospectum-mixin-0.1.0.jar`.
+Output: `runtime/mixin-bootstrap/build/libs/retrospectum-mixin-0.2.0.jar`.
 
 On Windows, the build helper configures the JDK paths:
 
@@ -35,11 +35,11 @@ start Forge as usual. Keep one copy of the Bootstrap per instance.
 ## Configure a mod
 
 Mod configurations are discovered in JARs under `mods/` and `mods/1.6.4/` through
-the `RetroMixinConfigs` manifest attribute:
+the `MixinConfigs` manifest attribute:
 
 ```groovy
 jar {
-    manifest.attributes('RetroMixinConfigs': 'mixins.example.json')
+    manifest.attributes('MixinConfigs': 'mixins.example.json')
 }
 ```
 
@@ -62,8 +62,8 @@ MIT. See [runtime components](THIRD-PARTY.md) and
 
 ## Maven artifacts
 
-The first release version is `0.1.0`, shared with Retrospectum Loom.
-Coordinate: `dev.desiderium.retro:retrospectum-mixin:0.1.0`.
+The next release version is `0.2.0`, shared with Retrospectum Loom.
+Coordinate: `dev.desiderium.retro:retrospectum-mixin:0.2.0`.
 Use `-Pversion=<version>` to override it for a future build.
 
 `./gradlew :mixin-bootstrap:mixinDistribution` writes a portable Maven repository
@@ -72,37 +72,8 @@ The primary artifact is the complete shaded runtime, including the Forge mod
 metadata class. Sources, Javadoc and upstream notices accompany it. Thin and
 intermediate shaded JARs are build intermediates; install the unclassified JAR.
 
-## CI artifacts
+## Reference
 
-GitHub Actions builds on Linux and Windows for pushes, pull requests and manual
-dispatch. It installs JDKs 7, 8 and 17, verifies pinned dependencies and upstream
-sources, checks Java 7 bytecode/API compatibility and inspects the runtime JAR.
-Download the runtime, sources, Javadoc and Maven ZIP from the workflow's
-**Artifacts** section. Verification reports are uploaded even on failure.
-The Build workflow packages artifacts; the Release Maven workflow handles remote publishing.
-
-For local artifact checks after building:
-
-```sh
-python scripts/verify_artifacts.py
-python scripts/audit_legacy_runtime.py --jar runtime/mixin-bootstrap/build/libs/retrospectum-mixin-0.1.0.jar --jdk /path/to/jdk7 --reference-jdk /path/to/jdk8 --java 7 --output build/reports/java7-api.json
-```
-
-These checks cover archive contents and Java APIs; they do not start Minecraft.
-
-For a version override, set `RELEASE_VERSION` to the same value when running
-`python scripts/verify_artifacts.py`. CI passes this value to Gradle as `-Pversion`.
-
-## Hosted Maven releases
-
-The public repository is `https://maven.desiderium.dev/releases/`.
-The **Release Maven** workflow verifies Linux and Windows builds and checks R2
-credentials. Enable its **publish** input to upload the Linux Maven artifacts.
-Use a new stable `MAJOR.MINOR.PATCH` version for changed binaries. Existing files
-are accepted only when identical, so interrupted uploads can be retried. Metadata
-updates preserve earlier versions and run serially within this repository.
-
-Configure organization or repository Actions secrets `R2_ACCESS_KEY_ID` and
-`R2_SECRET_ACCESS_KEY`, restricted to the `desiderium-maven` bucket. Organization
-secrets must grant this repository access. A run with **publish** disabled builds
-and checks credentials without uploading artifacts.
+- [Compatibility and stable interface names](https://github.com/DesideriumMC/RetrospectumModTemplate/blob/main/docs/COMPATIBILITY.md)
+- [Troubleshooting](https://github.com/DesideriumMC/RetrospectumModTemplate/blob/main/docs/TROUBLESHOOTING.md)
+- [Release procedure](https://github.com/DesideriumMC/RetrospectumLoom/blob/main/RELEASING.md)

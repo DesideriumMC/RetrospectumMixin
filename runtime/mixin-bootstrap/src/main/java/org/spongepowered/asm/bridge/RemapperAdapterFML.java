@@ -10,7 +10,7 @@ import net.minecraft.launchwrapper.Launch;
 import org.objectweb.asm.commons.Remapper;
 import org.spongepowered.asm.mixin.extensibility.IRemapper;
 
-/** See ADR-0001-P1-MIXIN-ISOLATION.md. */
+/** Reflective bridge between relocated ASM and Forge's original ASM4 remapper. */
 public final class RemapperAdapterFML extends RemapperAdapter {
     private final Object fml;
     private final Method unmap;
@@ -25,7 +25,7 @@ public final class RemapperAdapterFML extends RemapperAdapter {
         try {
             Class<?> type = Class.forName("cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper", true, Launch.classLoader);
             IRemapper bridge = new RemapperAdapterFML(type.getField("INSTANCE").get(null));
-            System.out.println("[RETROMIXIN-P1] isolated FML remapper bridge installed");
+            System.out.println("[RETROMIXIN] isolated FML remapper bridge installed");
             return bridge;
         } catch (Exception e) {
             throw new IllegalStateException("Cannot bridge Forge .1345 remapper", e);

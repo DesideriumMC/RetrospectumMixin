@@ -1,6 +1,5 @@
 {
   "project": "RetroMixin",
-  "upstreamCommit": "da68a85cc6b5b6e336edd6f37db37f5b9657441e",
   "gradle": {
     "version": "8.14.6",
     "sha256": "7988ed071b2a07900e2ec715fca15c6ab72bce6db433af301fa7fa7e9407bd24",
@@ -11,17 +10,12 @@
       "name": "forge-1.6.4-9.11.1.1345-universal.jar",
       "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.6.4-9.11.1.1345/forge-1.6.4-9.11.1.1345-universal.jar",
       "sha256": "7acfb321c4b1fd35253b73dd2715f47cf3c38ee3ec4586d762c217114697df01",
-      "license": "Forge/FML and bundled component notices; full inventory pending"
+      "license": "Forge/FML and bundled component notices; compile-only API input, not redistributed"
     }
   ],
-  "forgeInstaller": {
-    "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.6.4-9.11.1.1345/forge-1.6.4-9.11.1.1345-installer.jar",
-    "sha256": "01a1845146ad7e5b00e4ff5e6d4d378577634c3dc6ca7e574ce42aabf6025dc0"
-  },
-  "origin": "Copied observed official artifact hashes from DesideriumLoom; compiler metadata is updated for this baseline.",
   "compiler": {
     "major": 8,
-    "source": "1.6",
-    "target": "1.6"
+    "source": "1.7",
+    "target": "1.7"
   }
 }

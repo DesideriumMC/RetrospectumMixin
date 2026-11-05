@@ -1,9 +1,11 @@
 # Mixin source subset
 
-The 12 Java files under `src/upstream/java` are unmodified source files from the
+The 12 Java files under `src/upstream/java` originate from the
 official `org.spongepowered:mixin:0.8.7:sources` artifact, under the upstream MIT
 license. Their individual SHA-256 values and the source archive hash are recorded
 in `gradle/mixin-upstream.lock.json`; compilation verifies the source hashes.
+The FML legacy platform agent has a local patch to make remapper installation
+fail fast. Its original hash and patch purpose are recorded separately in the lock.
 
 These LaunchWrapper/FML integration files were distributed as Java 8 bytecode.
 This project recompiles them with JDK 8 against the Java 7 runtime API and emits
