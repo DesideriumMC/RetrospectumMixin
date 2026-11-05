@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        default: '0.1.0'
 
 permissions:
   contents: read
@@ -11,6 +16,9 @@ permissions:
 concurrency:
   group: build-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  RELEASE_VERSION: ${{ inputs.version || '0.1.0' }}
 
 jobs:
   build:
@@ -53,20 +61,29 @@ jobs:
           JAVA7_HOME: ${{ steps.java7.outputs.path }}
           JAVA8_HOME: ${{ steps.java8.outputs.path }}
         run: |
-          bash ./gradlew --no-daemon --console=plain "-Pjava7Home=$JAVA7_HOME" "-Porg.gradle.java.installations.paths=$JAVA7_HOME,$JAVA8_HOME,$JAVA_HOME" clean build :mixin-bootstrap:mixinDistribution
+          bash ./gradlew --no-daemon --console=plain "-Pjava7Home=$JAVA7_HOME" "-Porg.gradle.java.installations.paths=$JAVA7_HOME,$JAVA8_HOME,$JAVA_HOME" "-Pversion=$RELEASE_VERSION" clean build :mixin-bootstrap:mixinDistribution
           python scripts/verify_artifacts.py
-          python scripts/audit_legacy_runtime.py --jar runtime/mixin-bootstrap/build/libs/retrospectum-mixin-0.1.0.jar --jdk "$JAVA7_HOME" --reference-jdk "$JAVA8_HOME" --java 7 --output build/reports/java7-api.json
+          python scripts/audit_legacy_runtime.py --jar runtime/mixin-bootstrap/build/libs/retrospectum-mixin-${RELEASE_VERSION}.jar --jdk "$JAVA7_HOME" --reference-jdk "$JAVA8_HOME" --java 7 --output build/reports/java7-api.json
       - name: Upload build artifacts
         uses: actions/upload-artifact@v6
         with:
           name: retrospectum-mixin-${{ runner.os }}
           path: |
-            runtime/mixin-bootstrap/build/libs/retrospectum-mixin-0.1.0.jar
-            runtime/mixin-bootstrap/build/libs/retrospectum-mixin-0.1.0-sources.jar
-            runtime/mixin-bootstrap/build/libs/retrospectum-mixin-0.1.0-javadoc.jar
+            runtime/mixin-bootstrap/build/libs/retrospectum-mixin-${{ env.RELEASE_VERSION }}.jar
+            runtime/mixin-bootstrap/build/libs/retrospectum-mixin-${{ env.RELEASE_VERSION }}-sources.jar
+            runtime/mixin-bootstrap/build/libs/retrospectum-mixin-${{ env.RELEASE_VERSION }}-javadoc.jar
             build/distributions/*-maven.zip
           if-no-files-found: error
           retention-days: 14
+      - name: Upload Maven repository
+        uses: actions/upload-artifact@v6
+        with:
+          name: maven-repository-${{ runner.os }}
+          path: build/maven/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Test publisher
+        run: python -m unittest discover -s scripts -p 'test_publish_maven.py'
       - name: Upload verification reports
         if: always()
         uses: actions/upload-artifact@v6

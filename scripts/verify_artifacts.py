@@ -4,6 +4,7 @@ import json
 import struct
 import zipfile
 import xml.etree.ElementTree as ET
+import os
 from pathlib import Path
 
 from hashlib import sha256 as digest
@@ -13,6 +14,7 @@ def sha256(path):
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = dict(line.split('=', 1) for line in (ROOT / 'gradle.properties').read_text().splitlines() if '=' in line)['version']
+VERSION = os.environ.get('RELEASE_VERSION', VERSION)
 
 
 def classes(jar, maximum):
