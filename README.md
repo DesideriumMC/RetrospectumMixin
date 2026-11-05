@@ -79,7 +79,7 @@ dispatch. It installs JDKs 7, 8 and 17, verifies pinned dependencies and upstrea
 sources, checks Java 7 bytecode/API compatibility and inspects the runtime JAR.
 Download the runtime, sources, Javadoc and Maven ZIP from the workflow's
 **Artifacts** section. Verification reports are uploaded even on failure.
-CI does not publish to remote Maven repositories or create GitHub releases.
+The Build workflow packages artifacts; the Release Maven workflow handles remote publishing.
 
 For local artifact checks after building:
 
